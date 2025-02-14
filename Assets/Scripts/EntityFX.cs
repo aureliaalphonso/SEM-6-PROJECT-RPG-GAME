@@ -12,10 +12,12 @@ public class EntityFX : MonoBehaviour
     [SerializeField] private Material hitMat;
     private Material originalMat;
 
+
     private void Start()
     {
         sr = GetComponentInChildren<SpriteRenderer>();
         originalMat = sr.material;
+
     }
 
     private IEnumerator FlashFX()
@@ -29,14 +31,10 @@ public class EntityFX : MonoBehaviour
 
     private void RedColorBlink()
     {
-        if(sr.color != Color.white)
-        {
+        if (sr.color != Color.white)
             sr.color = Color.white;
-        }
         else
-        {
             sr.color = Color.red;
-        }
     }
 
     private void CancelRedBlink()

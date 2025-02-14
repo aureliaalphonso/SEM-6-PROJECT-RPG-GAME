@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Accessibility;
 
 public class Entity : MonoBehaviour
 {
@@ -9,6 +10,9 @@ public class Entity : MonoBehaviour
     public Animator anim { get; private set; }
     public Rigidbody2D rb { get; private set; }
     public EntityFX fx { get; private set; }
+    public SpriteRenderer sr { get; private set; }
+    public CharacterStats stats { get; private set; }
+    public CapsuleCollider2D cd { get; private set; }
     #endregion
 
     [Header("Knockback info")]
@@ -28,7 +32,6 @@ public class Entity : MonoBehaviour
     public int facingDir { get; private set; } = 1;
     protected bool facingRight = true;
 
-    
     protected virtual void Awake()
     {
 
@@ -36,14 +39,17 @@ public class Entity : MonoBehaviour
 
     protected virtual void Start()
     {
-        fx = GetComponent<EntityFX>();
+        sr = GetComponentInChildren<SpriteRenderer>();
         anim = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        fx = GetComponent<EntityFX>();
+        stats = GetComponent<CharacterStats>();
+        cd = GetComponent<CapsuleCollider2D>();
     }
 
     protected virtual void Update()
     {
-        
+
     }
 
     public virtual void Damage()
@@ -51,8 +57,7 @@ public class Entity : MonoBehaviour
         fx.StartCoroutine("FlashFX");
         StartCoroutine("HitKnockback");
 
-
-        //Debug.Log(gameObject.name + "was damaged");
+        //Debug.Log(gameObject.name + "  was damaged!");
     }
 
     protected virtual IEnumerator HitKnockback()
@@ -65,33 +70,24 @@ public class Entity : MonoBehaviour
         isKnocked = false;
     }
 
-    
     #region Velocity
-    public void ZeroVelocity()
+    public void SetZeroVelocity()
     {
-        if(isKnocked)
-        {
+        if (isKnocked)
             return;
-        }
-        
+
         rb.velocity = new Vector2(0, 0);
     }
 
     public void SetVelocity(float _xVelocity, float _yVelocity)
     {
-        if(isKnocked)
-        { 
+        if (isKnocked)
             return;
-        }
-
 
         rb.velocity = new Vector2(_xVelocity, _yVelocity);
         FlipController(_xVelocity);
     }
-
     #endregion
-
-
     #region Collision
     public virtual bool IsGroundDetected() => Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, whatIsGround);
     public virtual bool IsWallDetected() => Physics2D.Raycast(wallCheck.position, Vector2.right * facingDir, wallCheckDistance, whatIsGround);
@@ -103,7 +99,6 @@ public class Entity : MonoBehaviour
         Gizmos.DrawWireSphere(attackCheck.position, attackCheckRadius);
     }
     #endregion
-
     #region Flip
     public virtual void Flip()
     {
@@ -114,14 +109,23 @@ public class Entity : MonoBehaviour
 
     public virtual void FlipController(float _x)
     {
-        if(_x > 0 && !facingRight)
-        {
+        if (_x > 0 && !facingRight)
             Flip();
-        }
-        else if(_x <0 && facingRight)
-        {
+        else if (_x < 0 && facingRight)
             Flip();
-        }
     }
     #endregion
+
+    public void MakeTransprent(bool _transprent)
+    {
+        if (_transprent)
+            sr.color = Color.clear;
+        else
+            sr.color = Color.white;
+    }
+
+    public virtual void Die()
+    {
+        
+    }
 }
